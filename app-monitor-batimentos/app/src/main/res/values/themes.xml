@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema da janela (o resto do visual é feito no Compose, em ui/Tema.kt). -->
+    <style name="Theme.MonitorBatimentos" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/fundo</item>
+        <item name="android:colorAccent">@color/batimentos</item>
+    </style>
+</resources>

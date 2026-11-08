@@ -1,0 +1,101 @@
+# config.py.example
+# ---------------------------------------------------------------------------
+# Copie este arquivo para "config.py" e ajuste os valores.
+# O config.py fica FORA do Git (veja .gitignore): cada placa tem os seus ajustes.
+# Placa: BitDogLab com Raspberry Pi Pico W (RP2040). Sensor: MAX30102.
+# ---------------------------------------------------------------------------
+
+# ---- Painel por Bluetooth (BLE) ------------------------------------------
+# A placa envia as leituras por Bluetooth Low Energy para a página
+# web/index.html, aberta no Chrome ou Edge (computador ou Android).
+# Não usa Wi-Fi nem internet. Veja o README.
+BLE_ATIVO = True
+BLE_NOME = "Batimentos"     # a placa aparece como "Batimentos-XXXX"
+
+# ---- Sensor MAX30102 no conector I2C externo da BitDogLab -----------------
+SENSOR_I2C_ID = 0           # I2C0
+SENSOR_SDA = 0              # GP0
+SENSOR_SCL = 1              # GP1
+SENSOR_I2C_FREQ = 400000    # 400 kHz
+
+# ---- Display OLED SSD1306 da BitDogLab ------------------------------------
+OLED_I2C_ID = 1             # I2C1
+OLED_SDA = 14               # GP14
+OLED_SCL = 15               # GP15
+OLED_ENDERECO = 0x3C
+# Enviar a tela leva 26 ms a 400 kHz e 12 ms a 1 MHz. O SSD1306 é
+# especificado para 400 kHz, mas muitos funcionam a 1 MHz: se a imagem
+# ficar perfeita, pode usar 1000000 para deixar o programa mais leve.
+OLED_FREQ = 400000
+
+# ---- Matriz 5x5, LED RGB, buzzer e botões (pinagem da BitDogLab) ----------
+MATRIZ_PINO = 7             # WS2812 em zigue-zague (veja lib/matriz.py)
+LED_R_PINO = 13
+LED_G_PINO = 11
+LED_B_PINO = 12
+BUZZER_PINO = 21            # PWM
+BOTAO_A_PINO = 5            # A: som liga/desliga
+BOTAO_B_PINO = 6            # B: Desafio do Pátio
+SOM_VOLUME = 0.15           # 0 a 0.5 (fração do ciclo do PWM)
+SOM_LIGADO_AO_INICIAR = True
+
+# Corrente dos LEDs: 0,2 mA por passo (0x00 a 0xFF = 0 a 51 mA).
+#   0x24 = 7,2 mA (testado: melhor ponto). Com 0x40 (12,8 mA) o IR saturou
+#   (261.680 de 262.143) e o pulso ficou mais fraco.
+# Se aparecer "SATURADO" com o dedo, diminua (ex.: 0x1A).
+# Se a oscilação do sinal ficar muito pequena, aumente (ex.: 0x30).
+LED_VERMELHO = 0x24
+LED_IR = 0x24
+
+# Taxa real de amostragem. O MAX30102 deste módulo roda ~4% acima dos
+# 100 Hz nominais (medido na Etapa 1: ~104 amostras/s).
+TAXA_AMOSTRAGEM_HZ = 104
+
+# ---- Desafio do Pátio (botão B) --------------------------------------------
+DESAFIO_REPOUSO_S = 15      # medição em repouso
+DESAFIO_EXERCICIO_S = 30    # contagem regressiva do exercício (B encerra antes)
+
+# ---- Detecção do dedo -------------------------------------------------------
+# Medido na Etapa 1 (LEDs a 7,2 mA):
+#   sem dedo      -> IR entre 1.600 e 2.300 (varia com a luz ambiente)
+#   dedo apoiado  -> IR entre 84.000 e 157.000
+# O limiar fica bem no meio, longe dos dois. No pátio (sol forte), confira
+# de novo o valor "sem dedo" com a Etapa 2 em modo "resumo".
+LIMIAR_DEDO = 30000         # acima disso: dedo chegou
+LIMIAR_DEDO_SAIDA = 20000   # abaixo disso: dedo saiu (histerese)
+TEMPO_ESTABILIZAR_MS = 1500 # espera após o dedo chegar, antes de medir
+
+# ---- Filtros (veja lib/sinal.py) -------------------------------------------
+ALFA_PASSA_ALTA = 0.95      # remoção do DC (corte ~0,84 Hz)
+CORTE_PASSA_BAIXA_HZ = 4.0  # suavização (Butterworth 2ª ordem)
+
+# ---- SpO2 (oxigenação aproximada) ------------------------------------------
+# O R (razão das razões) é medido como no código de referência da Maxim
+# (MAXREFDES117). Para converter R em SpO2 há duas curvas publicadas:
+#   "linear": SpO2 = SPO2_A - SPO2_B x R  (clássica: A = 110, B = 25)
+#   "maxim" : SpO2 = -45,060·R² + 30,354·R + 94,845 (curva da Maxim)
+# As duas são EMPÍRICAS e, NESTE módulo, dão valores irreais (~75% e ~55%
+# em repouso), porque o R dele é mais alto que o dos sensores originais.
+#
+# MEDIDO NESTE MÓDULO (dedo leve, em repouso, 3 sessões): R = 1,26 / 1,29 / 1,38.
+# A luz da sala NÃO influencia (LEDs apagados: ~43 contagens de ~100.000).
+# Apertar o dedo faz o pulso sumir: use o dedo só encostado.
+#
+# CALIBRAÇÃO PRESUMIDA (1 ponto, sem aparelho de referência):
+#   SUPOMOS que uma pessoa saudável em repouso tem SPO2_REFERENCIA (97%) e
+#   que isso corresponde ao R medido em repouso (R_REPOUSO). A inclinação
+#   SPO2_B (25% por unidade de R) vem da fórmula clássica.
+#   ATENÇÃO: é uma SUPOSIÇÃO, não uma medida. O aparelho mostra ~97% para
+#   quem está em repouso porque foi ajustado para isso. Diga isso na
+#   apresentação! Só variações em relação ao repouso trazem informação.
+#
+# CALIBRAÇÃO REAL (se conseguir um oxímetro de dedo ou smartwatch):
+#   meça a mesma pessoa com os dois ao mesmo tempo, coloque o valor do
+#   aparelho em SPO2_REFERENCIA, o R mostrado pela Etapa 4 em R_REPOUSO,
+#   e mude SPO2_PRESUMIDO para False.
+SPO2_MODELO = "linear"
+SPO2_B = 25.0
+SPO2_REFERENCIA = 97.0      # % (presumido: adulto saudável em repouso)
+R_REPOUSO = 1.30            # mediana das 3 sessões medidas neste módulo
+SPO2_A = SPO2_REFERENCIA + SPO2_B * R_REPOUSO   # = 129,5
+SPO2_PRESUMIDO = True       # True = as telas mostram o aviso "calibração presumida"

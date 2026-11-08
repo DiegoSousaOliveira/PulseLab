@@ -1,0 +1,18 @@
+{
+    "micropico.syncFolder": "monitor-batimentos",
+    "micropico.openOnStart": true,
+    "micropico.autoConnect": false,
+    "micropico.pyIgnore": [
+        "**/.picowgo",
+        "**/.micropico",
+        "**/.vscode",
+        "**/.gitignore",
+        "**/.git",
+        "**/.DS_Store",
+        "**/project.pico-go",
+        "**/env",
+        "**/venv",
+        "**/.venv",
+        "**/.idea"
+    ]
+}

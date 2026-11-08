@@ -1,0 +1,12 @@
+# Normaliza as quebras de linha dos arquivos de texto no repositório.
+* text=auto
+
+# Scripts do Gradle: o gradlew precisa de LF (Linux/Mac); o .bat, de CRLF (Windows).
+gradlew text eol=lf
+*.bat text eol=crlf
+
+# Binários: nunca mexer nas quebras de linha.
+*.jar binary
+*.ttf binary
+*.png binary
+*.jpg binary

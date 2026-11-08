@@ -1,0 +1,7 @@
+# Credenciais de Wi-Fi e ajustes locais da placa
+config.py
+
+# Arquivos gerados
+__pycache__/
+*.mpy
+.DS_Store

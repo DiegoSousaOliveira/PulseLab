@@ -1,0 +1,29 @@
+# ---- Geral --------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# ---- Python / MicroPython ------------------------------------------------
+__pycache__/
+*.pyc
+*.mpy
+.venv/
+venv/
+
+# Ajustes locais de cada placa (veja monitor-batimentos/config.py.example)
+monitor-batimentos/config.py
+
+# ---- Android / Gradle -----------------------------------------------------
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.keystore
+*.jks
